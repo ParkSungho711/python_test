@@ -1,0 +1,395 @@
+import tkinter as tk
+from tkinter import messagebox
+from tkinter import scrolledtext
+
+# --- 파이썬 코딩활용능력 1급 모의고사 (실전 흐름 추적 40제 V2) ---
+quiz_data = [
+    {
+        "question": "1. 다음 코드의 출력 결과로 알맞은 것은 무엇인가요?\n\ns = 'A'\nprint(s * 3)",
+        "options": ["A", "3A", "AAA", "에러 발생"],
+        "answer": 2,
+        "hint": "문자열에 곱하기(*) 기호를 사용하면 복사 붙여넣기를 여러 번 한 것과 같은 효과가 납니다."
+    },
+    {
+        "question": "2. 리스트 요소 삽입 코드의 결과로 알맞은 것은?\n\nlst = [1, 3]\nlst.insert(1, 2)\nprint(lst)",
+        "options": ["[2, 1, 3]", "[1, 2, 3]", "[1, 3, 2]", "에러 발생"],
+        "answer": 1,
+        "hint": "insert의 첫 번째 괄호 숫자는 '어느 위치(인덱스)에 넣을 것인지'를 의미합니다."
+    },
+    {
+        "question": "3. 딕셔너리 키 업데이트 결과로 알맞은 것은?\n\nd = {'a': 1}\nd['a'] = 2\nd['b'] = 3\nprint(sum(d.values()))",
+        "options": ["3", "4", "5", "6"],
+        "answer": 2,
+        "hint": "딕셔너리는 동일한 키가 다시 들어오면 기존의 값을 새로운 값으로 덮어씁니다(Overwriting)."
+    },
+    {
+        "question": "4. 집합(Set) 업데이트 코드의 결과는?\n\ns = {1, 2}\ns.update([2, 3])\nprint(len(s))",
+        "options": ["2", "3", "4", "5"],
+        "answer": 1,
+        "hint": "집합(Set) 자료구조의 가장 큰 특징인 '중복 불가' 성질을 떠올려보세요."
+    },
+    {
+        "question": "5. 파이썬 산술 연산의 결과는?\n\nx = 7\ny = 3\nprint((x // y) + (x % y))",
+        "options": ["2", "3", "4", "5"],
+        "answer": 1,
+        "hint": "// 연산자는 나눗셈의 '몫'을, % 연산자는 '나머지'를 의미합니다."
+    },
+    {
+        "question": "6. 복합 대입 연산자를 추적한 결과는?\n\nx = 10\nx += 5\nx -= 2\nprint(x)",
+        "options": ["10", "13", "15", "17"],
+        "answer": 1,
+        "hint": "위에서부터 아래로 한 줄씩 변수 x의 상태가 어떻게 변하는지 적어보세요."
+    },
+    {
+        "question": "7. 논리 연산자의 평가 결과는?\n\na = True\nb = False\nprint(a and not b)",
+        "options": ["True", "False", "None", "에러 발생"],
+        "answer": 0,
+        "hint": "not 연산자가 b(False)의 값을 반대로 뒤집는다는 점을 먼저 생각하세요."
+    },
+    {
+        "question": "8. 문자열 슬라이싱 코드의 결과는?\n\ns = 'python'\nprint(s[1:4])",
+        "options": ["pyt", "yth", "tho", "ytho"],
+        "answer": 1,
+        "hint": "[시작:끝] 문법에서 '끝' 번호에 해당하는 글자는 포함되지 않습니다."
+    },
+    {
+        "question": "9. for 문을 이용한 누적 합산 코드의 결과는?\n\ntot = 0\nfor i in range(1, 4):\n    tot += i * 10\nprint(tot)",
+        "options": ["30", "40", "50", "60"],
+        "answer": 3,
+        "hint": "range(1, 4)는 1부터 3까지의 숫자를 만들어냅니다."
+    },
+    {
+        "question": "10. 조건식과 함께 쓰인 while 문의 종료 후 결과는?\n\nn = 5\nwhile n > 2:\n    n -= 1\nprint(n)",
+        "options": ["1", "2", "3", "4"],
+        "answer": 1,
+        "hint": "n이 3이 되어 반복문 안으로 들어간 직후, n -= 1 코드를 거치면서 값이 어떻게 변하는지 주의하세요."
+    },
+    {
+        "question": "11. 문자열을 순회하는 반복문 추적 결과는?\n\ncnt = 0\nfor c in 'apple':\n    if c == 'p':\n        cnt += 1\nprint(cnt)",
+        "options": ["0", "1", "2", "3"],
+        "answer": 2,
+        "hint": "주어진 단어 안에 특정 알파벳이 몇 개 들어있는지 세는 간단한 로직입니다."
+    },
+    {
+        "question": "12. 함수의 기본 인자값(Default Argument)을 활용한 결과는?\n\ndef f(x=10):\n    return x + 5\nprint(f(5) + f())",
+        "options": ["15", "20", "25", "30"],
+        "answer": 2,
+        "hint": "함수 호출 시 괄호 안이 비어있으면 함수 정의부에 지정된 기본값이 대신 사용됩니다."
+    },
+    {
+        "question": "13. 예외 처리 구문의 흐름을 추적한 결과는?\n\ntry:\n    x = 10 / 0\nexcept:\n    x = -1\nprint(x)",
+        "options": ["0", "-1", "10", "에러 발생으로 종료"],
+        "answer": 1,
+        "hint": "파이썬에서 어떤 숫자를 0으로 나누면 즉시 예외(ZeroDivisionError)가 발생합니다."
+    },
+    {
+        "question": "14. 자료형 변환 및 확인 코드의 결과는?\n\nx = '123'\ny = int(x)\nprint(type(y) == int)",
+        "options": ["True", "False", "1", "0"],
+        "answer": 0,
+        "hint": "int() 함수는 변수를 정수형 자료형(integer)으로 강제 형변환합니다."
+    },
+    {
+        "question": "15. 리스트 정렬 메서드 사용 결과는?\n\nlst = [3, 1, 2]\nlst.sort()\nprint(lst[0])",
+        "options": ["1", "2", "3", "None"],
+        "answer": 0,
+        "hint": "sort() 메서드는 원본 리스트의 요소를 작은 것부터 큰 것 순서(오름차순)로 정렬합니다."
+    },
+    {
+        "question": "16. 멤버십 연산자의 평가 결과는?\n\nprint('a' in 'banana')",
+        "options": ["True", "False", "3", "1"],
+        "answer": 0,
+        "hint": "in 연산자는 '오른쪽 데이터 안에 왼쪽 데이터가 들어있는지' 예/아니오(True/False)로 대답합니다."
+    },
+    {
+        "question": "17. 문자열 연결 및 길이 확인 코드의 결과는?\n\nprint(len('hi' + 'bye'))",
+        "options": ["2", "3", "5", "6"],
+        "answer": 2,
+        "hint": "더하기 기호(+)는 두 문자를 여백 없이 딱 붙여서 하나의 새로운 단어로 만듭니다."
+    },
+    {
+        "question": "18. 리스트 요소 확장(extend) 메서드의 결과는?\n\nlst = [1]\nlst.extend([2, 3])\nprint(len(lst))",
+        "options": ["1", "2", "3", "4"],
+        "answer": 2,
+        "hint": "extend는 괄호 안의 리스트를 분해하여 기존 리스트의 끝에 하나씩 덧붙입니다."
+    },
+    {
+        "question": "19. 딕셔너리 get() 메서드 안전 접근의 결과는?\n\nd = {'x': 10}\nprint(d.get('y', 20))",
+        "options": ["10", "20", "None", "KeyError"],
+        "answer": 1,
+        "hint": "get(찾을키, 대체값)은 안전장치가 마련된 데이터 탐색 방법입니다."
+    },
+    {
+        "question": "20. 다중 값을 반환하는 함수 호출의 결과는?\n\ndef calc(a, b):\n    return a+b, a-b\nx, y = calc(5, 3)\nprint(x * y)",
+        "options": ["2", "8", "10", "16"],
+        "answer": 3,
+        "hint": "파이썬에서 쉼표로 여러 값을 반환하면 튜플로 묶여 나오며, 순서대로 변수 x와 y에 배정됩니다."
+    },
+    {
+        "question": "21. 반복문을 탈출하는 break 키워드 추적 결과는?\n\nx = 0\nfor i in range(5):\n    if i == 2:\n        break\n    x += i\nprint(x)",
+        "options": ["1", "3", "6", "10"],
+        "answer": 0,
+        "hint": "break 문을 만나는 즉시 반복문은 완전히 산산조각 나며 멈춰버립니다."
+    },
+    {
+        "question": "22. 반복문을 건너뛰는 continue 키워드 추적 결과는?\n\nx = 0\nfor i in range(4):\n    if i == 1:\n        continue\n    x += i\nprint(x)",
+        "options": ["3", "5", "6", "10"],
+        "answer": 1,
+        "hint": "continue는 이번 턴의 남은 코드를 무시하고 다음 바퀴(턴)로 바로 넘어가게 합니다."
+    },
+    {
+        "question": "23. 문자열 쪼개기(split) 메서드의 결과는?\n\ns = 'a,b,c'\nprint(s.split(',')[1])",
+        "options": ["a", "b", "c", "에러 발생"],
+        "answer": 1,
+        "hint": "파이썬의 리스트 인덱스는 항상 0번부터 시작한다는 사실을 잊지 마세요."
+    },
+    {
+        "question": "24. 리스트에서 요소를 뽑아내는 pop() 메서드의 결과는?\n\nlst = [10, 20, 30]\nval = lst.pop(0)\nprint(val)",
+        "options": ["10", "20", "30", "[20, 30]"],
+        "answer": 0,
+        "hint": "pop 안의 숫자는 값이 아니라 '몇 번째 자리'에 있는 요소인지를 나타내는 인덱스입니다."
+    },
+    {
+        "question": "25. 불리언(bool) 평가 및 논리 연산의 결과는?\n\nprint(bool(0) or bool([1]))",
+        "options": ["True", "False", "0", "1"],
+        "answer": 0,
+        "hint": "파이썬에서 숫자 0이나 텅 비어있는 컨테이너는 거짓(False)으로 취급됩니다."
+    },
+    {
+        "question": "26. 리스트 변수 참조 복사의 결과는?\n\na = [1, 2]\nb = a\nb.append(3)\nprint(len(a))",
+        "options": ["1", "2", "3", "4"],
+        "answer": 2,
+        "hint": "대입 연산자(=)로 리스트를 다른 변수에 넘기면, 같은 리스트를 가리키는 열쇠가 하나 더 생기는 것과 같습니다."
+    },
+    {
+        "question": "27. 튜플의 인덱싱 및 음수 인덱스 활용 결과는?\n\nt = (10, 20, 30)\nprint(t[0] + t[-1])",
+        "options": ["20", "30", "40", "50"],
+        "answer": 2,
+        "hint": "파이썬에서 리스트나 튜플의 인덱스가 -1이면 무조건 가장 끝 쪽에 있는 값을 가리킵니다."
+    },
+    {
+        "question": "28. if-elif 조건문의 흐름 추적 결과는?\n\nx = 5\nif x > 3:\n    x = 1\nelif x > 0:\n    x = 2\nprint(x)",
+        "options": ["1", "2", "3", "5"],
+        "answer": 0,
+        "hint": "if - elif 덩어리는 여러 조건 중 위에서부터 '단 하나만' 당첨되면 나머지는 무시합니다."
+    },
+    {
+        "question": "29. 이중(중첩) for문의 실행 결과는?\n\ntot = 0\nfor i in range(2):\n    for j in range(2):\n        tot += (i + j)\nprint(tot)",
+        "options": ["2", "4", "6", "8"],
+        "answer": 1,
+        "hint": "i가 0일 때 j는 0과 1이 되고, i가 1일 때 j는 다시 0과 1이 됩니다. 이 모든 조합의 합을 구하세요."
+    },
+    {
+        "question": "30. 전역 변수(global) 수정의 결과는?\n\nx = 1\ndef add():\n    global x\n    x += 2\nadd()\nadd()\nprint(x)",
+        "options": ["1", "3", "5", "7"],
+        "answer": 2,
+        "hint": "global 키워드가 선언되면 함수 밖의 변수를 직접 가져와서 값을 누적시킬 수 있습니다."
+    },
+    {
+        "question": "31. 내장 함수 sum()의 두 번째 인자 활용 결과는?\n\nprint(sum([1, 2], 5))",
+        "options": ["3", "5", "8", "에러 발생"],
+        "answer": 2,
+        "hint": "sum(리스트, 시작값) 형태로 사용하면, 시작값에 리스트의 요소들의 값을 추가로 더합니다."
+    },
+    {
+        "question": "32. 최댓값과 최솟값을 구하는 내장 함수의 결과는?\n\nprint(max(2, 5, 1) - min(2, 5, 1))",
+        "options": ["3", "4", "5", "6"],
+        "answer": 1,
+        "hint": "가장 큰 숫자(max)를 찾고, 거기서 가장 작은 숫자(min)를 빼보세요."
+    },
+    {
+        "question": "33. 절댓값 연산과 몫 나눗셈의 혼합 결과는?\n\nprint(abs(-7) // 2)",
+        "options": ["-4", "-3", "3", "4"],
+        "answer": 2,
+        "hint": "abs() 함수는 숫자의 부호를 떼어버리고 항상 양수로 만들어주는 절댓값 함수입니다."
+    },
+    {
+        "question": "34. 문자열 결합(join) 메서드의 결과는?\n\nprint(''.join(['A', 'B']))",
+        "options": ["A B", "A", "B", "AB"],
+        "answer": 3,
+        "hint": "따옴표 안에 아무것도 없다는 것은, 리스트의 글자들을 여백 없이 그냥 딱 붙이겠다는 의미입니다."
+    },
+    {
+        "question": "35. 딕셔너리에서 요소를 삭제하는 pop 메서드의 결과는?\n\nd = {1: 'A', 2: 'B'}\nd.pop(1)\nprint(len(d))",
+        "options": ["0", "1", "2", "에러 발생"],
+        "answer": 1,
+        "hint": "딕셔너리의 pop() 괄호 안에 들어가는 숫자는 인덱스가 아니라 삭제하고 싶은 고유한 '키(Key)'입니다."
+    },
+    {
+        "question": "36. 문자열 대문자 변환 및 논리 비교의 결과는?\n\nprint('hi'.upper() == 'HI')",
+        "options": ["True", "False", "1", "0"],
+        "answer": 0,
+        "hint": "upper()라는 단어 뜻 그대로 영단어 글자를 모두 커다랗게(대문자로) 올려버리는 역할을 합니다."
+    },
+    {
+        "question": "37. 세 번째 인자(step)를 사용한 range 함수의 결과는?\n\nprint(list(range(1, 6, 2)))",
+        "options": ["[1, 2, 3]", "[1, 3]", "[1, 3, 5]", "[2, 4]"],
+        "answer": 2,
+        "hint": "range(시작, 끝, 간격) 입니다. 시작점부터 몇 칸씩 폴짝폴짝 뛸지 생각해보세요."
+    },
+    {
+        "question": "38. 파이썬의 변수 값 교환(Swap) 결과는?\n\na = 3\nb = 7\na, b = b, a\nprint(a - b)",
+        "options": ["-4", "0", "4", "10"],
+        "answer": 2,
+        "hint": "파이썬에서는 변수 두 개의 위치를 등호(=)를 기준으로 교차 배치하면 값이 서로 맞바뀝니다."
+    },
+    {
+        "question": "39. while 문 조건 검사의 종료 시점 추적 결과는?\n\nx = 1\nwhile x < 10:\n    x *= 2\nprint(x)",
+        "options": ["8", "10", "12", "16"],
+        "answer": 3,
+        "hint": "x가 8이 되었을 때, '8 < 10'은 참입니다. 그러면 반복문 안으로 들어가서 다시 한 번 곱하기가 실행됩니다."
+    },
+    {
+        "question": "40. 집합(Set) 요소 삭제 후 멤버십 테스트 결과는?\n\ns = {1, 2}\ns.remove(2)\nprint(2 in s)",
+        "options": ["True", "False", "1", "에러 발생"],
+        "answer": 1,
+        "hint": "remove()로 지우고 나면 껍데기만 남을 뿐, 그 데이터는 집합 안에서 완전히 사라집니다."
+    }
+]
+
+class QuizApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("파이썬 코딩활용능력 1급 (실전 흐름 추적 40제)")
+        self.root.geometry("850x660")
+        self.root.configure(bg="#F0FDFA") # 아주 연한 민트색 배경
+        
+        self.score = 0
+        self.current_question_idx = 0
+        self.wrong_answers = [] 
+        
+        # 타이틀 바 (진한 틸/청록색)
+        self.title_frame = tk.Frame(root, bg="#0D9488", pady=15)
+        self.title_frame.pack(fill="x")
+        self.title_label = tk.Label(self.title_frame, text="파이썬 실전 흐름 추적 40제 (V2)", font=("맑은 고딕", 16, "bold"), fg="white", bg="#0D9488")
+        self.title_label.pack()
+
+        # 중앙 카드 프레임
+        self.card_frame = tk.Frame(root, bg="white", padx=30, pady=30, highlightbackground="#99F6E4", highlightthickness=2)
+        self.card_frame.pack(fill="both", expand=True, padx=40, pady=30)
+        
+        self.progress_label = tk.Label(self.card_frame, text="", font=("맑은 고딕", 11, "bold"), fg="#64748B", bg="white")
+        self.progress_label.pack(anchor="e", pady=(0, 15))
+
+        self.question_label = tk.Label(self.card_frame, text="", font=("Consolas", 12, "bold"), fg="#0F172A", bg="white", justify="left", wraplength=700)
+        self.question_label.pack(anchor="w", pady=(0, 20))
+        
+        self.options_frame = tk.Frame(self.card_frame, bg="white")
+        self.options_frame.pack(fill="x", pady=10)
+        
+        self.var = tk.IntVar()
+        self.radio_buttons = []
+        for i in range(4):
+            rb = tk.Radiobutton(self.options_frame, text="", variable=self.var, value=i, 
+                                font=("맑은 고딕", 11), fg="#334155", bg="white",
+                                activebackground="white", selectcolor="white",
+                                justify="left", wraplength=650)
+            rb.pack(anchor="w", pady=6)
+            self.radio_buttons.append(rb)
+            
+        self.button_frame = tk.Frame(self.card_frame, bg="white")
+        self.button_frame.pack(fill="x", pady=(20, 0))
+
+        self.hint_visible = False
+        self.hint_button = tk.Button(self.button_frame, text="💡 힌트 보기", command=self.toggle_hint, 
+                                     font=("맑은 고딕", 10, "bold"), bg="#FDE047", fg="#A16207", 
+                                     activebackground="#FACC15", relief="flat", cursor="hand2", padx=10, pady=5)
+        self.hint_button.pack(side="left")
+        
+        self.next_button = tk.Button(self.button_frame, text="다음 문제 ➔", command=self.next_question, 
+                                     font=("맑은 고딕", 11, "bold"), bg="#0D9488", fg="white", 
+                                     activebackground="#0F766E", relief="flat", cursor="hand2", padx=15, pady=5)
+        self.next_button.pack(side="right")
+        
+        self.hint_label = tk.Label(self.card_frame, text="", font=("맑은 고딕", 10, "italic"), fg="#0F766E", bg="#CCFBF1", 
+                                   justify="left", wraplength=700, padx=10, pady=10)
+
+        self.load_question()
+
+    def toggle_hint(self):
+        if self.hint_visible:
+            self.hint_label.pack_forget()
+            self.hint_button.config(text="💡 힌트 보기")
+            self.hint_visible = False
+        else:
+            self.hint_label.pack(before=self.button_frame, fill="x", pady=(0, 15))
+            self.hint_button.config(text="💡 힌트 닫기")
+            self.hint_visible = True
+
+    def load_question(self):
+        self.var.set(-1) 
+        if self.hint_visible:
+            self.toggle_hint()
+            
+        q_data = quiz_data[self.current_question_idx]
+        self.progress_label.config(text=f"진행 상황: {self.current_question_idx + 1} / {len(quiz_data)}")
+        self.question_label.config(text=q_data["question"])
+        self.hint_label.config(text=f"힌트: {q_data['hint']}")
+        
+        for i in range(4):
+            self.radio_buttons[i].config(text=q_data["options"][i])
+            
+        if self.current_question_idx == len(quiz_data) - 1:
+            self.next_button.config(text="최종 결과 확인 ✔️", bg="#E11D48", activebackground="#BE123C")
+
+    def next_question(self):
+        selected_option = self.var.get()
+        if selected_option == -1:
+            messagebox.showwarning("안내", "답을 하나 선택해 주세요!")
+            return
+            
+        q_data = quiz_data[self.current_question_idx]
+        correct_answer = q_data["answer"]
+        
+        if selected_option == correct_answer:
+            self.score += 1
+        else:
+            self.wrong_answers.append({
+                "question": q_data["question"],
+                "my_answer": q_data["options"][selected_option],
+                "correct_answer": q_data["options"][correct_answer]
+            })
+            
+        self.current_question_idx += 1
+        if self.current_question_idx < len(quiz_data):
+            self.load_question()
+        else:
+            self.show_result()
+
+    def show_result(self):
+        self.title_frame.destroy()
+        self.card_frame.destroy()
+        
+        result_card = tk.Frame(self.root, bg="white", padx=30, pady=30, highlightbackground="#99F6E4", highlightthickness=2)
+        result_card.pack(fill="both", expand=True, padx=40, pady=40)
+        
+        score_text = f"🎉 40문제 완주를 축하합니다!\n\n총 {len(quiz_data)}문제 중 {self.score}문제를 맞췄습니다."
+        score_label = tk.Label(result_card, text=score_text, font=("맑은 고딕", 16, "bold"), fg="#0D9488", bg="white")
+        score_label.pack(pady=(0, 20))
+        
+        if self.wrong_answers:
+            wrong_label = tk.Label(result_card, text="[ 오답 노트 ]", font=("맑은 고딕", 12, "bold"), bg="white", fg="#475569")
+            wrong_label.pack(anchor="w", pady=(0, 10))
+            
+            st = scrolledtext.ScrolledText(result_card, wrap=tk.WORD, font=("Consolas", 11), bg="#F8FAFC", fg="#0F172A", padx=10, pady=10)
+            st.pack(fill="both", expand=True)
+            
+            for idx, wrong in enumerate(self.wrong_answers, 1):
+                st.insert(tk.END, f"❌ 틀린 문제 {idx}:\n{wrong['question']}\n\n")
+                st.insert(tk.END, f"내가 고른 답 : {wrong['my_answer']}\n")
+                st.insert(tk.END, f"정답         : {wrong['correct_answer']}\n")
+                st.insert(tk.END, "="*60 + "\n\n")
+                
+            st.config(state="disabled")
+        else:
+            perfect_label = tk.Label(result_card, text="💯 대단합니다! 40문제 모두 정답입니다.", font=("맑은 고딕", 14, "bold"), fg="#059669", bg="white")
+            perfect_label.pack(pady=40)
+
+        exit_button = tk.Button(result_card, text="프로그램 종료", command=self.root.destroy, 
+                                font=("맑은 고딕", 12, "bold"), bg="#64748B", fg="white", 
+                                activebackground="#475569", relief="flat", cursor="hand2", padx=20, pady=10)
+        exit_button.pack(pady=(20, 0))
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = QuizApp(root)
+    root.mainloop()
